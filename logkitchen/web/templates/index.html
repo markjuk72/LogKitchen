@@ -106,6 +106,16 @@
         header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        header .logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
         }
 
         header p {
@@ -293,12 +303,13 @@
 
         .alert {
             padding: 15px;
+            padding-top: 40px;
             border-radius: 6px;
             margin-bottom: 20px;
             display: none;
-            white-space: pre-line;
             line-height: 1.6;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .alert.error {
@@ -315,6 +326,64 @@
 
         .alert.active {
             display: block;
+        }
+
+        .alert-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border: none;
+            color: inherit;
+            font-size: 20px;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .alert-close:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .command-block {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            padding-right: 45px;
+        }
+
+        .copy-btn {
+            position: absolute;
+            right: 8px;
+            top: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: inherit;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .copy-btn:active {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .copy-btn.copied {
+            background: rgba(76, 175, 80, 0.5);
         }
 
         .help-text {
@@ -399,6 +468,61 @@
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
         }
+
+        .file-list {
+            margin-top: 15px;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .file-list h4 {
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        .file-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .file-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .file-name {
+            font-weight: 600;
+        }
+
+        .file-meta {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .no-files {
+            font-style: italic;
+            opacity: 0.7;
+        }
+
+        .ingest-command {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin-top: 10px;
+            word-break: break-all;
+            user-select: all;
+        }
     </style>
 </head>
 <body>
@@ -407,7 +531,10 @@
             <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">
                 🌙 Dark Mode
             </button>
-            <h1>🍳 LogKitchen</h1>
+            <h1>
+                <img src="/static/logo.png" alt="LogKitchen Logo" class="logo">
+                LogKitchen
+            </h1>
             <p>Synthetic Log Generator for SIEM Testing</p>
         </header>
 
@@ -416,7 +543,7 @@
 
             <div class="info-banner">
                 <h3>🔍 Integrated with Azure Data Explorer (Kusto)</h3>
-                <p>This LogKitchen instance is running alongside Kustainer - a local Azure Data Explorer for analyzing your generated logs with KQL (Kusto Query Language).</p>
+                <p>This LogKitchen instance is running alongside Kustainer - a local Azure Data Explorer for analyzing your generated logs with KQL.</p>
 
                 <div class="links">
                     <div class="link-item" id="kustoStatus" style="cursor: default;">
@@ -426,25 +553,21 @@
                 </div>
 
                 <div class="integration-steps">
-                    <strong>🚀 Quick Start Guide (Persistent Database):</strong>
+                    <strong>🚀 Quick Start:</strong>
                     <ol>
-                        <li><strong>Generate logs:</strong> Use the form below to create synthetic logs</li>
-                        <li><strong>Download logs:</strong> Save them to the <code>outputs/</code> folder (automatically shared with Kustainer)</li>
-                        <li><strong>Connect to Kusto:</strong> Use Kusto Explorer or Kusto CLI (Windows apps) to connect to <code>http://localhost:8080</code></li>
-                        <li><strong>Create persistent database:</strong>
-                            <br><code>.create database LogAnalysis persist (@"/kustodata/dbs/LogAnalysis/md", @"/kustodata/dbs/LogAnalysis/data")</code>
-                        </li>
-                        <li><strong>Create a table:</strong>
-                            <br><code>.create table Logs (Timestamp:datetime, Level:string, Message:string, Host:string)</code>
-                        </li>
-                        <li><strong>Ingest from shared folder:</strong>
-                            <br><code>.ingest into table Logs (@"/logs/yourfile.log") with (format="csv", ignoreFirstRecord=false)</code>
-                        </li>
-                        <li><strong>Query:</strong> <code>Logs | take 10</code> or <code>Logs | summarize count() by Level</code></li>
+                        <li>Generate logs using the form below</li>
+                        <li>Click "Save to Outputs Folder" - logs are saved as CSV files (Kusto-compatible format)</li>
+                        <li>Point Kusto Explorer at this cluster's host on port <code>9001</code></li>
+                        <li>Copy the table creation and ingest commands shown after saving</li>
+                        <li>Or click any file below to see its ingest command</li>
                     </ol>
-                    <p style="margin-top: 10px; font-size: 0.9em;">
-                        💾 <strong>Note:</strong> Databases created with <code>persist</code> survive container restarts via the <code>kustodata/</code> folder!
-                    </p>
+                </div>
+
+                <div class="file-list">
+                    <h4>📂 Available Log Files in /logs (click to view ingest command):</h4>
+                    <div id="fileListContainer">
+                        <div class="no-files">Loading...</div>
+                    </div>
                 </div>
             </div>
 
@@ -505,15 +628,83 @@
     <script>
         let currentLogs = [];
         let currentLogType = '';
+        let alertTimeout = null;
 
-        function showAlert(message, type = 'error') {
+        function showAlert(message, type = 'error', persistent = false) {
             const alert = document.getElementById('alert');
-            alert.textContent = message;
+
+            // Clear any existing timeout
+            if (alertTimeout) {
+                clearTimeout(alertTimeout);
+                alertTimeout = null;
+            }
+
+            // Set the message (can be HTML)
+            alert.innerHTML = message;
             alert.className = `alert ${type} active`;
-            setTimeout(() => {
-                alert.classList.remove('active');
-            }, 5000);
+
+            // Add close button
+            if (!alert.querySelector('.alert-close')) {
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'alert-close';
+                closeBtn.innerHTML = '×';
+                closeBtn.onclick = () => {
+                    alert.classList.remove('active');
+                    if (alertTimeout) {
+                        clearTimeout(alertTimeout);
+                        alertTimeout = null;
+                    }
+                };
+                alert.insertBefore(closeBtn, alert.firstChild);
+            }
+
+            // Auto-dismiss errors after 5 seconds, but keep success messages with commands persistent
+            if (!persistent && type === 'error') {
+                alertTimeout = setTimeout(() => {
+                    alert.classList.remove('active');
+                }, 5000);
+            }
         }
+
+        function copyToClipboard(text, button) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                button.classList.add('copied');
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                showAlert('Failed to copy to clipboard. Please copy manually.', 'error');
+            });
+        }
+
+        function formatCommandWithCopy(command, label) {
+            // Store command in a Map to avoid escaping issues
+            const buttonId = 'copy-btn-' + Math.random().toString(36).substr(2, 9);
+            if (!window.commandMap) {
+                window.commandMap = new Map();
+            }
+            window.commandMap.set(buttonId, command);
+
+            return `<div class="command-block">
+                <strong>${label}</strong><br>
+                <span style="word-break: break-all;">${command}</span>
+                <button class="copy-btn" id="${buttonId}">📋 Copy</button>
+            </div>`;
+        }
+
+        // Set up event delegation for copy buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('copy-btn') && e.target.id) {
+                const command = window.commandMap.get(e.target.id);
+                if (command) {
+                    copyToClipboard(command, e.target);
+                }
+            }
+        });
 
         async function generateLogs() {
             const logType = document.getElementById('log_type').value;
@@ -601,13 +792,26 @@
                     throw new Error(data.error || 'Failed to save logs');
                 }
 
-                showAlert(
-                    `✅ ${data.message}\n\n` +
-                    `📁 File: ${data.filename}\n` +
-                    `🔍 Kusto path: ${data.kusto_path}\n\n` +
-                    `Ready to ingest into Kustainer!`,
-                    'success'
-                );
+                // Generate commands
+                const createTableCommand = data.create_command || `.create table ${data.table_name} (RawLog:string)`;
+                const ingestCommand = `.ingest into table ${data.table_name} (@"${data.kusto_path}") with (format="csv", ignoreFirstRecord=true)`;
+
+                const messageHtml = `
+                    <div style="padding-right: 30px;">
+                        <strong>✅ ${data.message}</strong><br><br>
+                        📁 File: <strong>${data.filename}</strong> (CSV format)<br>
+                        🔍 Kusto path: <code>${data.kusto_path}</code><br>
+                        📊 Table: <code>${data.table_name}</code><br><br>
+                        ${formatCommandWithCopy(createTableCommand, '📋 Step 1: Create the table (run once)')}
+                        ${formatCommandWithCopy(ingestCommand, '📋 Step 2: Ingest the data')}
+                        <small style="opacity: 0.8;">💡 Click the copy buttons to copy each command</small>
+                    </div>
+                `;
+
+                showAlert(messageHtml, 'success', true);
+
+                // Refresh the file list
+                loadFileList();
 
             } catch (error) {
                 showAlert(error.message);
@@ -725,11 +929,69 @@
             }
         }
 
+        // Load file list
+        async function loadFileList() {
+            const fileListContainer = document.getElementById('fileListContainer');
+
+            try {
+                const response = await fetch('/list_log_files');
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load file list');
+                }
+
+                if (data.files.length === 0) {
+                    fileListContainer.innerHTML = '<div class="no-files">No log files available yet. Generate and save logs to see them here.</div>';
+                } else {
+                    let html = '';
+                    for (const file of data.files) {
+                        const sizeKB = (file.size / 1024).toFixed(2);
+                        const fileFormat = file.name.endsWith('.csv') ? 'CSV' : 'LOG';
+                        const ingestCmd = `.ingest into table ${file.table_name} (@"${file.kusto_path}") with (format="csv", ignoreFirstRecord=true)`;
+
+                        html += `
+                            <div class="file-item" onclick="showIngestCommand('${file.name}', '${file.table_name}', '${file.kusto_path}')" style="cursor: pointer;" title="Click to see ingest command">
+                                <div>
+                                    <div class="file-name">${file.name}</div>
+                                    <div class="file-meta">${sizeKB} KB • ${file.modified} • ${fileFormat}</div>
+                                </div>
+                                <div style="font-size: 0.8em; opacity: 0.7;">→ ${file.table_name}</div>
+                            </div>
+                        `;
+                    }
+                    fileListContainer.innerHTML = html;
+                }
+            } catch (error) {
+                fileListContainer.innerHTML = '<div class="no-files">Error loading file list</div>';
+            }
+        }
+
+        function showIngestCommand(filename, tableName, kustoPath) {
+            const ingestCommand = `.ingest into table ${tableName} (@"${kustoPath}") with (format="csv", ignoreFirstRecord=true)`;
+
+            const messageHtml = `
+                <div style="padding-right: 30px;">
+                    <strong>📋 Ingest Command for ${filename}</strong><br><br>
+                    📊 Table: <code>${tableName}</code><br>
+                    🔍 File: <code>${kustoPath}</code><br><br>
+                    ${formatCommandWithCopy(ingestCommand, 'Copy this command to Kusto Explorer')}
+                    <small style="opacity: 0.8;">💡 Note: Make sure the table exists before ingesting</small>
+                </div>
+            `;
+
+            showAlert(messageHtml, 'success', true);
+        }
+
         // Check status on page load
         checkKustoStatus();
+        loadFileList();
 
         // Check status every 30 seconds
         setInterval(checkKustoStatus, 30000);
+
+        // Refresh file list every 30 seconds
+        setInterval(loadFileList, 30000);
     </script>
 </body>
 </html>

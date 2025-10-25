@@ -34,8 +34,13 @@ env/
 
 # Output files
 output/
+outputs/
 *.log
+*.csv
 !examples/sample_outputs/*.log
+
+# Kustainer database files
+kustodata/
 
 # OS
 .DS_Store
