@@ -1,0 +1,157 @@
+# LogKitchen Default Configuration
+
+# Global settings
+global:
+  # Random seed for reproducible output (null for random)
+  seed: null
+
+  # Default number of logs to generate
+  default_count: 100
+
+  # Maximum days in the past for timestamps
+  max_days_past: 7
+
+# IP address configuration
+network:
+  # Use private IP addresses for internal hosts
+  private_ip_subnets:
+    - "10.0.0.0/8"
+    - "172.16.0.0/12"
+    - "192.168.0.0/16"
+
+  # Generate public IPs for external sources
+  use_public_ips: true
+
+# User configuration
+users:
+  # Common Linux usernames
+  linux_users:
+    - root
+    - admin
+    - ubuntu
+    - centos
+    - deploy
+    - ansible
+    - jenkins
+    - www-data
+    - mysql
+    - postgres
+
+  # Common Windows usernames
+  windows_users:
+    - Administrator
+    - admin
+    - john.doe
+    - jane.smith
+    - service_account
+    - backup_admin
+    - sql_service
+
+# Host configuration
+hosts:
+  # Hostname prefixes
+  linux_prefixes:
+    - web
+    - app
+    - db
+    - mail
+    - dns
+    - fw
+    - proxy
+
+  windows_prefixes:
+    - DC
+    - WS
+    - SRV
+    - FS
+    - EXCH
+    - SQL
+
+  # Windows domains
+  windows_domains:
+    - CORP
+    - ENTERPRISE
+    - DOMAIN
+    - CONTOSO
+
+# Syslog configuration
+syslog:
+  # Event type weights (must sum to 1.0)
+  event_weights:
+    ssh: 0.30
+    sudo: 0.15
+    auth: 0.15
+    cron: 0.10
+    systemd: 0.15
+    kernel: 0.05
+    network: 0.10
+
+  # SSH success/failure ratio
+  ssh_success_rate: 0.60
+
+# Auditd configuration
+auditd:
+  event_weights:
+    syscall: 0.25
+    execve: 0.25
+    user_auth: 0.15
+    user_cmd: 0.15
+    cred: 0.10
+    login: 0.10
+
+# CEF Firewall configuration
+cef_firewall:
+  # Event type weights
+  event_weights:
+    traffic: 0.70
+    threat: 0.20
+    system: 0.10
+
+  # Traffic allow/deny ratio
+  traffic_allow_rate: 0.70
+
+  # Firewall vendors
+  vendors:
+    - name: "Palo Alto Networks"
+      product: "PAN-OS"
+      versions: ["9.0.0", "9.1.0", "10.0.0", "10.1.0"]
+    - name: "Cisco"
+      product: "ASA"
+      versions: ["9.8", "9.12", "9.14"]
+    - name: "Fortinet"
+      product: "FortiGate"
+      versions: ["6.0.0", "6.2.0", "6.4.0", "7.0.0"]
+
+# Windows Security Events configuration
+windows_security:
+  # Event ID weights
+  event_weights:
+    4624: 0.35  # Successful logon
+    4625: 0.15  # Failed logon
+    4634: 0.20  # Logoff
+    4672: 0.05  # Special privileges
+    4720: 0.02  # User created
+    4732: 0.03  # Member added to group
+    4740: 0.02  # Account locked
+    4768: 0.05  # Kerberos TGT
+    4776: 0.05  # NTLM auth
+    5140: 0.05  # Share access
+    5156: 0.02  # FW allowed
+    5157: 0.01  # FW blocked
+
+  # Logon success rate
+  logon_success_rate: 0.85
+
+# Output configuration
+output:
+  # Default output directory
+  output_dir: "./output"
+
+  # File naming pattern (supports: {type}, {timestamp}, {count})
+  filename_pattern: "{type}_{timestamp}.log"
+
+  # Timestamp format for filenames
+  timestamp_format: "%Y%m%d_%H%M%S"
+
+  # Add timestamps to console output
+  console_timestamps: true

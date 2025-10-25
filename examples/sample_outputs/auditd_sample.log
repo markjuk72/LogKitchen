@@ -1,0 +1,10 @@
+type=SYSCALL msg=audit(1698246225.123:1234): arch=c000003e syscall=59 success=yes exit=0 a0=7ffe1234 a1=7ffe5678 a2=7ffe9abc a3=7ffedef0 items=2 ppid=1234 pid=23456 auid=1000 uid=1000 gid=1000 euid=1000 egid=1000 comm="ls" exe="/bin/ls" key="commands"
+type=EXECVE msg=audit(1698246225.123:1234): argc=2 a0="ls" a1="-la"
+type=USER_AUTH msg=audit(1698246226.456:1235): pid=23457 uid=0 auid=1000 msg='op=PAM:authentication grantors=pam_unix acct="ubuntu" exe="/usr/sbin/sshd" hostname=203.0.113.45 addr=203.0.113.45 terminal=ssh res=success'
+type=SYSCALL msg=audit(1698246227.789:1236): arch=c000003e syscall=90 success=yes exit=0 a0=1a2b3c4d a1=5e6f7g8h a2=9i0j1k2l a3=3m4n5o6p items=1 ppid=5678 pid=23458 auid=1000 uid=0 gid=0 euid=0 egid=0 comm="chmod" exe="/bin/chmod" key="modify"
+type=USER_CMD msg=audit(1698246228.012:1237): pid=23459 uid=1000 auid=1000 msg='cwd="/home/admin" cmd="/usr/bin/systemctl restart nginx" terminal=pts/0 res=success'
+type=CRED_ACQ msg=audit(1698246229.345:1238): pid=23460 uid=0 auid=1000 msg='op=PAM:setcred grantors=pam_unix acct="admin" exe="/usr/bin/sudo" hostname=? addr=? terminal=pts/1 res=success'
+type=LOGIN msg=audit(1698246230.678:1239): pid=23461 uid=1000 old-auid=unset auid=1000 tty=pts/0 old-ses=unset ses=123 res=success
+type=SYSCALL msg=audit(1698246231.901:1240): arch=c000003e syscall=42 success=yes exit=0 a0=abc123 a1=def456 a2=789ghi a3=jkl012 items=0 ppid=9012 pid=23462 auid=1000 uid=1000 gid=1000 euid=1000 egid=1000 comm="ssh" exe="/usr/bin/ssh" key="(null)"
+type=EXECVE msg=audit(1698246232.234:1241): argc=3 a0="sudo" a1="-i" a2="systemctl restart nginx"
+type=USER_AUTH msg=audit(1698246233.567:1242): pid=23463 uid=0 auid=1001 msg='op=PAM:authentication grantors=pam_unix acct="deploy" exe="/bin/login" hostname=? addr=? terminal=pts/2 res=failed'

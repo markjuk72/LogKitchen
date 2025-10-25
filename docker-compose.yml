@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  logkitchen:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: logkitchen-web
+    ports:
+      - "9001:9001"
+    volumes:
+      # Mount config directory for custom configurations
+      - ./config:/app/config:ro
+      # Mount outputs directory to save generated logs
+      - ./outputs:/app/outputs
+    environment:
+      - FLASK_APP=logkitchen.web.app
+      - FLASK_ENV=production
+      - PORT=9001
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    networks:
+      - logkitchen-network
+
+  kustainer:
+    image: mcr.microsoft.com/azuredataexplorer/kustainer-linux:latest
+    container_name: kustainer-adx
+    ports:
+      - "9002:8080"
+    volumes:
+      # Mount for database persistence (survives container restarts)
+      - ./kustodata:/kustodata
+      # Mount outputs directory for log file ingestion
+      - ./outputs:/logs:ro
+    environment:
+      - ACCEPT_EULA=Y
+    mem_limit: 4g
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - logkitchen-network
+
+networks:
+  logkitchen-network:
+    driver: bridge
